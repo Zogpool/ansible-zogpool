@@ -1,0 +1,104 @@
+---
+- name: Clone config4cpp
+  git: repo=https://github.com/config4star/config4cpp
+        dest=~/config4cpp
+
+- name: Compile config4cpp
+  shell: make -C ~/config4cpp -j$(nproc)
+
+- name: Clone flatbuffers
+  git: repo=https://github.com/google/flatbuffers
+        dest=~/flatbuffers
+
+- name: Creates directory flatbuffers
+  file: path=~/flatbuffers/build state=directory
+
+- name: Compile flatbuffers 1
+  shell: cmake .. chdir=~/flatbuffers/build/
+
+- name: Compile flatbuffers 2
+  shell: make -j$(nproc) chdir=~/flatbuffers/build/
+
+- name: Compile flatbuffers 3
+  shell: make install chdir=~/flatbuffers/build/
+
+- name: Clone libp2p
+  git: repo=https://github.com/eXtremal-ik7/libp2p
+        dest=~/libp2p version=version/0.3
+
+- name: Creates directory libp2p
+  file: path=~/libp2p/x86_64-Linux state=directory
+
+- name: Compile libp2p 1
+  shell: cmake ../src chdir=~/libp2p/x86_64-Linux/
+
+- name: Compile libp2p 2
+  shell: make -j$(nproc) chdir=~/libp2p/x86_64-Linux/
+
+- name: Clone poolcore
+  git: repo=https://github.com/Zogpool/poolcore
+        dest=~/poolcore
+
+- name: Creates directory poolcore
+  file: path=~/poolcore/x86_64-Linux state=directory
+
+- name: Compile poolcore 1
+  shell: cmake ../src -DROOT_SOURCE_DIR=~/ -DZCASH_ENABLED=1 chdir=~/poolcore/x86_64-Linux/
+
+- name: Compile poolcore 2
+  shell: make -j$(nproc) chdir=~/poolcore/x86_64-Linux/
+
+# TODO Change for our repos!
+- name: Clone pool_frontend_zcash
+  git: repo=https://github.com/Zogpool/pool_frontend_zcash
+        dest=~/pool_frontend_zcash
+
+- name: Creates directory pool_frontend_zcash
+  file: path=~/pool_frontend_zcash/x86_64-Linux state=directory
+
+- name: Compile pool_frontend_zcash 1
+  shell: cmake ../src -DROOT_SOURCE_DIR=~/ chdir=~/pool_frontend_zcash/x86_64-Linux/
+
+- name: Compile pool_frontend_zcash 2
+  shell: make -j$(nproc) chdir=~/pool_frontend_zcash/x86_64-Linux/
+
+- name: Clone poolrestapi
+  git: repo=https://github.com/Zogpool/poolrestapi
+        dest=~/poolrestapi
+
+- name: Creates directory poolrestapi
+  file: path=~/poolrestapi/x86_64-Linux state=directory
+
+- name: Compile poolrestapi 1
+  shell: cmake ../src -DROOT_SOURCE_DIR=~/ chdir=~/poolrestapi/x86_64-Linux/
+
+- name: Compile poolrestapi 2
+  shell: make -j$(nproc) chdir=~/poolrestapi/x86_64-Linux/
+
+- name: Clone ngxrest
+  git: repo=https://github.com/Zogpool/ngxrest
+        dest=~/ngxrest
+
+- name: Download nginx
+  get_url: url=https://nginx.org/download/nginx-1.11.5.tar.gz dest=~/nginx-1.11.5.tar.gz
+
+- name: Unzip nginx
+  unarchive: src=~/nginx-1.11.5.tar.gz dest=~/ remote_src=yes
+
+- name: Compile nginx 1
+  shell: ./configure --prefix=NGINX_INSTALL_DIRECTORY --add-module=/root/ngxrest chdir=~/nginx-1.11.5/
+
+- name: Compile nginx 2
+  shell: make -j$(nproc) chdir=~/nginx-1.11.5/
+
+- name: Compile nginx 3
+  shell: make install chdir=~/nginx-1.11.5/
+
+- name: Patch Zcash 1
+  shell: patch -p0 < ~/pool_frontend_zcash/pool.diff chdir=~/zcash/
+
+- name: Patch Zcash 2
+  shell: patch -p0 -F3 < ~/pool_frontend_zcash/makefile.diff chdir=~/zcash/
+
+- name: Compile Zcash with patch
+  shell: make -j$(nproc) chdir=~/zcash/

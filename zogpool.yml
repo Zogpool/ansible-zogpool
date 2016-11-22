@@ -1,0 +1,12 @@
+---
+- name: Install Zcash pool software
+  hosts: all
+  sudo: yes
+  # remote_user: user
+  # become: yes
+  # become_method: sudo
+
+  roles:
+    - common
+    - zcash
+    - pool

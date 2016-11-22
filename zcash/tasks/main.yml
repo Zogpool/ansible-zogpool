@@ -1,0 +1,12 @@
+---
+- name: Clone Zcash
+# TODO Fetch certain version 'version=v1.0.3'
+  git: repo=https://github.com/zcash/zcash.git
+        dest=~/zcash version=v1.0.3
+
+- name: Run fetch params
+  shell: ~/zcash/zcutil/fetch-params.sh creates=~/.zcash-params
+
+  # Careful, this won't run if zcash-cli exists, to recompile one needs to del
+- name: Compile
+  shell: ~/zcash/zcutil/build.sh -j$(nproc) creates=~/zcash/src/zcash-cli

@@ -1,0 +1,28 @@
+---
+- name: Install dependencies
+  apt: name={{item}} state=installed update_cache=yes
+  with_items:
+    - build-essential
+    - cmake
+    - libssl-dev
+    - libsodium-dev
+    - libpcre3-dev
+    - libleveldb-dev
+    - libboost-all-dev
+    - libgmp-dev
+    - libprotobuf-dev
+    - protobuf-compiler
+    - libjansson-dev
+    - pkg-config
+    - libc6-dev
+    - m4
+    - g++-multilib
+    - autoconf
+    - libtool
+    - ncurses-dev
+    - unzip
+    - git
+    - zlib1g-dev
+    - wget
+    - bsdmainutils
+    - automake
